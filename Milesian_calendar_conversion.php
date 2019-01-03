@@ -1,7 +1,7 @@
 <?php 
 //////////////////////////////////////////////////////////////////////////////
 // Conversion from Julian Day to Milesian date and the reverse. 
-// Copyright Miletus 2016 - Louis A. de Fouquières
+// Copyright Miletus 2016-2019 - Louis A. de Fouquières
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
 // "Software"), to deal in the Software without restriction, including
@@ -83,7 +83,7 @@ function long_milesian_year ($year) { // boolean, says whether $year (milesian) 
 // $year must be int, this cannot be controlled before PHP 7.x
 If ($year < -4713 or $year > 9999) throw new DomainException("Year is out of range or ill specified");
 $year += 7201; // set to a positive number, because modulus computation does not handle properly negative numbers.
-return $year % 4 == 0 and ($year % 100 != 0 or ($year % 400 == 0 and $year % 3200 != 0)) ; 
+return $year % 4 == 0 and ($year % 100 != 0 or $year % 400 == 0) ; 
 }
 function milesiantojd ($month, $day, $year) { // similar to gregoriantojd; control of validity of milesian date, year between -4713 and +9999.
 	if  (($year < -4713) or ($year > 9999)) throw new DomainException("Year is out of range or ill-specified");
@@ -92,8 +92,8 @@ function milesiantojd ($month, $day, $year) { // similar to gregoriantojd; contr
 	or (($day == 31) and ($month % 2 == 1)) 
 	or ($month == 12 and $day == 31 and ! long_milesian_year($year)))
 	throw new DomainException("This date does not exist");
-	$year +=4000; //set to milesian year origin; this is OK using intdiv_a and not the standard intdiv integer division.
-	return (260080 + $year*365 + intdiv_a($year,4) - intdiv_a($year,100) + intdiv_a($year,400) - intdiv_a($year,3200)
+	//Compute from 1 1m 000; this is OK using intdiv_a and not the standard intdiv integer division.
+	return (1721049 + $year*365 + intdiv_a($year,4) - intdiv_a($year,100) + intdiv_a($year,400) 
 		+ --$month*30 +intdiv_a($month,2)) +$day;
 }
 function cal_from_jd_milesian ($jd){ //an extension of the cal_from_jd routine defined since php 4.1.0., for the Milesian calendar. 
@@ -109,10 +109,10 @@ $MILESIAN_MONTH_LATIN = array ("unemis", "secondemis", "tertemis",
 $MILESIAN_MONTH_NOTATION = array ("1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m", "10m", "11m", "12m");
 //
 if ($jd < 0 or $jd > 5373471) throw new DomainException("Julian Day is out of range or ill-specified");
-$day = $jd-260081; // milesian day, starting 1 1m -4000; it may be negative.
+$day = $jd-1721049; // day counted from eve of 1 1m 0; it may be negative.
 // In the next computations, $day is set to the positive remainder of the integer division, whereas the quotient is directly used to compute the year then the month.
-$year = 3200*intdiv_r ($day,1168775) - 4000; // Year Anno Domini initiated at the beginning of the suitable Milesian epoch, i.e. -4000, -800, 2400 etc.
-$year += intdiv_r ($day, 146097) * 400; 
+// $year = 3200*intdiv_r ($day,1168775) - 4000; // Year Anno Domini initiated at the beginning of the suitable Milesian epoch, i.e. -4000, -800, 2400 etc.
+$year = 400 * intdiv_r ($day, 146097); 
 $year += intdiv_r_ceil ($day, 36524, 4) * 100; 
 $year += intdiv_r ($day, 1461) * 4;
 $year += intdiv_r_ceil ($day, 365, 4);
