@@ -1,47 +1,54 @@
 <?php 
-//////////////////////////////////////////////////////////////////////////////
-// Conversion from Julian Day to Milesian date and the reverse. 
-// Copyright Miletus 2016-2019 - Louis A. de Fouquières
-// Permission is hereby granted, free of charge, to any person obtaining
-// a copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to
-// permit persons to whom the Software is furnished to do so, subject to
-// the following conditions:
-// 1. The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-// 2. Changes with respect to any former version shall be documented.
-//
-// The software is provided "as is", without warranty of any kind,
-// express of implied, including but not limited to the warranties of
-// merchantability, fitness for a particular purpose and noninfringement.
-// In no event shall the authors of copyright holders be liable for any
-// claim, damages or other liability, whether in an action of contract,
-// tort or otherwise, arising from, out of or in connection with the software
-// or the use or other dealings in the software.
-// Inquiries: www.calendriermilesien.org
-///////////////////////////////////////////////////////////////////////////////
-// Written after a version under Ada
-// Tested under PHP 5.4.x.
-//
-// The purpose of this package is to provide conversion routines 
-// between a Julian Day the equivalent date in the Milesian calendar.
-// Main functions:
-//		milesiantojd ($month, $day, $year) - similar to gregoriantojd, but arguments represent a date of the Milesian calendar.
-//		cal_from_jd_milesian ($jd) - similar to cal_from_jd, specifically for the milesian calendar 
-// which is not referenced under the PHP user community.
-// 		french_weekday_name ($dow, $title) - yields the complete name of the weekdays in French, beginning or not with a capital.
-// Other functions are usefull for the abovementionned, and are available for broader use: 
-//		intdiv_a is a special implementation of intdiv (not available under PHP 5.4.x), so that the remainder is non-negative.
-//		intdiv_r does the same, except that the first argument is by reference, it holds the remainder on return.
-//		intidiv_r_ceiling is the integer division with positive remainder and ceiling: the remainder may be set to
-// the divisor, when the ordinary quotient reaches the ceiling. 
-// This routine is used e.g. to find the rank of year and of day in the year, in a quadriannum whose last year is the longest.
-//
-// Caution: all arguments are deemed integers (int). Control cannot be performed before PHP 7.
-//////////////////////////////////////////////////////////////////////////////////
-//
+/*
+Conversion from Julian Day to Milesian date and the reverse. 
+Written after a version under Ada
+Tested under PHP 5.4.x.
+
+The purpose of this package is to provide conversion routines 
+between a Julian Day the equivalent date in the Milesian calendar.
+Main functions:
+	milesiantojd ($month, $day, $year) - similar to gregoriantojd, but arguments represent a date of the Milesian calendar.
+	cal_from_jd_milesian ($jd) - similar to cal_from_jd, specifically for the milesian calendar 
+		which is not referenced under the PHP user community.
+	french_weekday_name ($dow, $title) - yields the complete name of the weekdays in French, beginning or not with a capital.
+Other functions are useful for the above mentioned, and are available for broader use: 
+	intdiv_a is a special implementation of intdiv (not available under PHP 5.4.x), so that the remainder is non-negative.
+	intdiv_r does the same, except that the first argument is by reference, it holds the remainder on return.
+	intidiv_r_ceiling is the integer division with positive remainder and ceiling: the remainder may be set to
+		the divisor, when the ordinary quotient reaches the ceiling. 
+This routine is used e.g. to find the rank of year and of day in the year, in a quadriannum whose last year is the longest.
+Caution: all arguments are deemed integers (int). Control cannot be performed before PHP 7.
+
+Version
+	2016: Original (translated from Ada)
+	2019: 
+		Solar intercalation rule is exactly the same as for the Gregorian calendar
+		Computations are possible with same limits as other calendars namely: JD <= 536838930, year <= 1465102
+		Error handling: like for other calendar, return array 0 0 0
+*/
+/*
+Copyright Miletus 2016-2019 - Louis A. de Fouquières
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+	1. The above copyright notice and this permission notice shall be included
+	in all copies or substantial portions of the Software.
+	2. Changes with respect to any former version shall be documented.
+
+The software is provided "as is", without warranty of any kind,
+express of implied, including but not limited to the warranties of
+merchantability, fitness for a particular purpose and noninfringement.
+In no event shall the authors of copyright holders be liable for any
+claim, damages or other liability, whether in an action of contract,
+tort or otherwise, arising from, out of or in connection with the software
+or the use or other dealings in the software.
+Inquiries: www.calendriermilesien.org
+*/
+
 function intdiv_a ($argument, $divisor) {  //here only values of arguments are passed. 
 //Almost the PHP 7.xx intdiv(), except that remainder is always >=0
 $cycle = 0;
@@ -81,20 +88,22 @@ return $cycle;
 }
 function long_milesian_year ($year) { // boolean, says whether $year (milesian) is 366 days long or not.
 // $year must be int, this cannot be controlled before PHP 7.x
-If ($year < -4713 or $year > 9999) throw new DomainException("Year is out of range or ill specified");
-$year += 7201; // set to a positive number, because modulus computation does not handle properly negative numbers.
+If ($year < -4713 or $year > 1465102) throw new DomainException("Year is out of range or ill specified");
+$year += 4801; // set to a positive number, because modulus computation does not handle properly negative numbers.
 return $year % 4 == 0 and ($year % 100 != 0 or $year % 400 == 0) ; 
 }
 function milesiantojd ($month, $day, $year) { // similar to gregoriantojd; control of validity of milesian date, year between -4713 and +9999.
-	if  (($year < -4713) or ($year > 9999)) throw new DomainException("Year is out of range or ill-specified");
+	if  (($year < -4713) or $year > 1465102) return 0; //throw new DomainException("Year is out of range or ill-specified");
 	if	((($month <=0) or ($month > 12)) 
 	or (($day <=0) or ($day >31)) 
 	or (($day == 31) and ($month % 2 == 1)) 
 	or ($month == 12 and $day == 31 and ! long_milesian_year($year)))
-	throw new DomainException("This date does not exist");
+	return 0; //throw new DomainException("This date does not exist");
 	//Compute from 1 1m 000; this is OK using intdiv_a and not the standard intdiv integer division.
-	return (1721049 + $year*365 + intdiv_a($year,4) - intdiv_a($year,100) + intdiv_a($year,400) 
-		+ --$month*30 +intdiv_a($month,2)) +$day;
+	return max (0,	// If computation leads to 0 or less, return 0; should raise an error.
+		(1721049 + $year*365 + intdiv_a($year,4) - intdiv_a($year,100) + intdiv_a($year,400) 
+		+ --$month*30 +intdiv_a($month,2)) +$day
+		);
 }
 function cal_from_jd_milesian ($jd){ //an extension of the cal_from_jd routine defined since php 4.1.0., for the Milesian calendar. 
 //Names suitable to the Milesian calendar
@@ -108,17 +117,27 @@ $MILESIAN_MONTH_LATIN = array ("unemis", "secondemis", "tertemis",
 //Const
 $MILESIAN_MONTH_NOTATION = array ("1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m", "10m", "11m", "12m");
 //
-if ($jd < 0 or $jd > 5373471) throw new DomainException("Julian Day is out of range or ill-specified");
-$day = $jd-1721049; // day counted from eve of 1 1m 0; it may be negative.
-// In the next computations, $day is set to the positive remainder of the integer division, whereas the quotient is directly used to compute the year then the month.
-// $year = 3200*intdiv_r ($day,1168775) - 4000; // Year Anno Domini initiated at the beginning of the suitable Milesian epoch, i.e. -4000, -800, 2400 etc.
+if ($jd <= 0 or $jd >  536838930) return array ( // throw new DomainException("Julian Day is out of range or ill-specified");
+	"date" => "",
+	"day" => 0,
+	"month" => 0,
+	"year" => 0,
+	"dow" => 0,
+	"abbrevdayname" => "",
+	"dayname" => "",
+	"abbrevmonth" => "",
+	"monthname" => "",	
+	);
+$day = $jd-1721050; // day counted from 1 1m 0; it may be negative.
+// In the next computations, $day is set to the positive remainder of the integer division, 
+// whereas the quotient is directly used to compute the year then the month.
 $year = 400 * intdiv_r ($day, 146097); 
 $year += intdiv_r_ceil ($day, 36524, 4) * 100; 
 $year += intdiv_r ($day, 1461) * 4;
 $year += intdiv_r_ceil ($day, 365, 4);
 $month = intdiv_r ($day, 61) * 2; // initiate rank of month
 $month += intdiv_r_ceil ($day, 30, 2); // This is the month rank (from 0). Enough for this purpose.
-$day++; //Add one because days are counted starting from 1.
+$day++; //Add one because days are counted starting from 1, not from 0.
 return array (
 "date" => $day." ".$MILESIAN_MONTH_NOTATION[$month]." ".$year,
 "month" => $month+1,
