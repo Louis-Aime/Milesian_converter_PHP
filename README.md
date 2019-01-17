@@ -6,7 +6,7 @@ Tested under PHP 5.4.x.
 boolean, says whether $year (in milesian) is 366 days long or not.
 ### function milesiantojd ($month, $day, $year)
 similar to gregoriantojd, but argument represent a milesian date; 
-control of validity of milesian date, year between -4713 and +9999.
+control of validity of milesian date, year between -4713 and 1465102.
 ### function cal_from_jd_milesian ($jd) 
 an extension of the cal_from_jd routine defined since php 4.1.0., for the Milesian calendar.
 
