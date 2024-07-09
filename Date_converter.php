@@ -1,31 +1,34 @@
-<html>
+<html lang="fr">
 <head>
-<meta content="text/css; charset=ISO-8859-1"
-http-equiv="content-type">
-<style type="text/css">
-  H1.dateconvert {text-align: center; font-size: 20pt; font-style: bold}
-  P.dateconvert {text-align: center; font-size: 16pt}
+<meta charset="UTF-8" />
+<style>
+  h1.dateconvert {text-align: center; font-size: 20pt; font-style: bold}
+  p.dateconvert {text-align: center; font-size: 16pt}
   td.dateconvert {text-align: center; font-size: 16pt}
-  Form.dateconvert {text-align: center; font-size: 16pt}
-  Input.dateconvert {text-align: center; font-family: Serif; font-size: 16pt}
-  Button.dateconvert {font-family: Serif; font-size: 16pt}
-  Table.dateconvert {font-size: 16pt}
+  form.dateconvert {text-align: center; font-size: 16pt}
+  input.dateconvert {text-align: center; font-family: Serif; font-size: 16pt}
+  button.dateconvert {font-family: Serif; font-size: 16pt}
+  table.dateconvert {font-size: 16pt}
 </style>
-<title><Convertisseur de dates</title> 
+<title>Convertisseur de dates - calendriers milÃ©sien et PHP</title> 
 </head>
 <body>
 <?php
 /*
 Display a date in Julian Day, and enables conversion
-form and to Milesian, gregorian, julian and jewish calendars.
-Copyright Miletus 2016-2019 - Louis A. de Fouquières
-Tested under PHP 5.4.x.
+from and to Milesian, gregorian, julian and jewish calendars.
+Copyright Miletus 2016-2024 - Louis A. de FouquiÃ¨res
+Tested under PHP 8.x.x
 Versions
 	2016 - original
 	2019 
 		re-order calendars presentation 
 		enable 0 julian day
 		enable 7-digit years and 9-digits days
+	2024
+		Encoding conversion to UTF-8
+		No capital in tag names
+		Update HTML head elements
 */
 /*
 Permission is hereby granted, free of charge, to any person obtaining
@@ -76,7 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 //	
 switch ($_POST ["Compute"])  {
 	case "Today" : 
-		$today = getdate(); // la date courante -- attention le tableau reçu de getdate n'a pas la même structure que $md.
+		$today = getdate(); // la date courante -- attention le tableau reÃ§u de getdate n'a pas la mÃªme structure que $md.
 		$message = "Dates et jour julien aujourd'hui";
 		$jd = gregoriantojd ($today["mon"], $today["mday"], $today["year"]); // Julian day of today
 		$md = cal_from_jd_milesian ($jd); // Milesian date of today
@@ -100,7 +103,7 @@ switch ($_POST ["Compute"])  {
 		$wd = french_weekday_name($md["dow"]);
 		}
 	catch (Exception $e) {
-		$message = "Jour julien irrégulier ou hors limites";
+		$message = "Jour julien irrÃ©gulier ou hors limites";
 		}
 	break;	
 	case "JulianDay" : try {	
@@ -113,7 +116,7 @@ switch ($_POST ["Compute"])  {
 		$jewdate = cal_from_jd ($jd, CAL_JEWISH);		$wd = french_weekday_name($md["dow"]);
 		}
 	catch (Exception $e) {
-		$message = "Jour julien irrégulier ou hors limites";
+		$message = "Jour julien irrÃ©gulier ou hors limites";
 		}
 	break;
 	case "Milesian" : try {
@@ -128,7 +131,7 @@ switch ($_POST ["Compute"])  {
 		$wd = french_weekday_name(jddayofweek($jd));
 		}
 	catch (Exception $e) {
-		$message = "Date irrégulière ou hors limites";
+		$message = "Date irrÃ©guliÃ¨re ou hors limites";
 		}
 	break;
 	case "Julian" : try {
@@ -143,7 +146,7 @@ switch ($_POST ["Compute"])  {
 		$wd = french_weekday_name(jddayofweek($jd));
 		}
 	catch (Exception $e) {
-		$message = "Date irrégulière ou hors limites";
+		$message = "Date irrÃ©guliÃ¨re ou hors limites";
 		}
 	break;
 	case "Gregorian" : try {
@@ -159,7 +162,7 @@ switch ($_POST ["Compute"])  {
 		$wd = french_weekday_name(jddayofweek($jd));
 		}
 	catch (Exception $e) {
-		$message = "Date irrégulière ou hors limites";
+		$message = "Date irrÃ©guliÃ¨re ou hors limites";
 		}
 	break;
 	case "Hebraic" : try {
@@ -174,13 +177,13 @@ switch ($_POST ["Compute"])  {
 		$wd = french_weekday_name(jddayofweek($jd));
 		}
 	catch (Exception $e) {
-		$message = "Date irrégulière ou hors limites";
+		$message = "Date irrÃ©guliÃ¨re ou hors limites";
 		}
 	break;
 }
 }
 else { // No data posted: prepare data of today, to be inserted in first form
-	$today = getdate(); // la date courante -- attention le tableau reçu de getdate n'a pas la même structure que $md.
+	$today = getdate(); // la date courante -- attention le tableau reÃ§u de getdate n'a pas la mÃªme structure que $md.
 	$message = "Dates et jour julien aujourd'hui";
 	$days = 1;
 	$jd = gregoriantojd ($today["mon"], $today["mday"], $today["year"]); // Julian day of today
@@ -193,29 +196,29 @@ else { // No data posted: prepare data of today, to be inserted in first form
 	$jewdate = cal_from_jd ($jd, CAL_JEWISH);		
 }
 ?>
-<H1 class="dateconvert">Convertisseur de dates milésiennes, juliennes, grégoriennes et hébraïques</H1>
-<p class="dateconvert">Années avant J.-C. selon la convention des astronomes, avec un an zéro: l'an -752 est l'an 753 av. J.-C.<br/>
-Le calendrier hébraïque ne comprend aucune date avant son origine.<BR/>
+<h1 class="dateconvert">Convertisseur de dates milÃ©siennes, juliennes, grÃ©goriennes et hÃ©braÃ¯ques</h1>
+<p class="dateconvert">AnnÃ©es avant J.-C. selon la convention des astronomes, avec un an zÃ©ro: l'an -752 est l'an 753 av. J.-C.<br/>
+Le calendrier hÃ©braÃ¯que ne comprend aucune date avant son origine.<br/>
 Les noms de mois romains sont en anglais, selon le standard du langage PHP.</p> 
 <form class="dateconvert" method="post">
-<Table class="dateconvert" align="center" >
+<table class="dateconvert" align="center" >
 	<tr><td class="dateconvert" colspan="3"><b><?php echo $message ?></b> </td></tr>
 	<tr>
 		<td><button class="dateconvert" type="submit" name="Compute" value="Today">Aujourd'hui</button></td>
 		<td><button class="dateconvert" type="submit" name="Compute" value="Shift">+/-jours</button></td>
 		<td><input class="dateconvert" type="int" size="4" name="days" value="<?php if (isset($days)) echo($days);?>"/></td>
 	</tr>
-	</Table> <br/>
+	</table> <br/>
 
 <table class="dateconvert" align="center">
-<tr><th>Calendrier</th><th>Quantième</th><th>Mois</th><th>Nom de mois</th><th>Année</th><th>Commande</th>
-<tr><td>Date milésienne:</td>
+<tr><th>Calendrier</th><th>QuantiÃ¨me</th><th>Mois</th><th>Nom de mois</th><th>AnnÃ©e</th><th>Commande</th>
+<tr><td>Date milÃ©sienne:</td>
 	<td><input class="dateconvert" type="int" size="2" maxlength="2" name="quant" value="<?php echo htmlEntities($md["day"]);?>" /> </td>
 	<td><input class="dateconvert" type="int" size="2" maxlength="2"  name="month" value="<?php echo htmlEntities($md["month"]);?>" /> </td>
 	<td><input class="dateconvert" type="text" size="10" disabled name="mmname" value="<?php if (isset($md["monthname"])) echo($md["monthname"]);?>" /></td>
 	<td><input class="dateconvert" type="int" size="7" maxlength="7"  name="year" value="<?php echo htmlEntities($md["year"]);?>" /> </td>
 	<td><button class="dateconvert" type="submit" name="Compute" value="Milesian">Calculer sur cette date</button></td>	
-<tr><td>Date grégorienne: </td>
+<tr><td>Date grÃ©gorienne: </td>
 	<td><input class="dateconvert" type="int" size="2" maxlength="2" name="gquant" value="<?php echo htmlEntities($gregdate["day"]);?>" /> </td>
 	<td><input class="dateconvert" type="int" size="2" maxlength="2"  name="gmonth" value="<?php echo htmlEntities($gregdate["month"]);?>" /> </td>
 	<td><input class="dateconvert" type="text" size="10" disabled name="gmname" value="<?php if (isset($gregdate["monthname"])) echo($gregdate["monthname"]);?>" /></td>
@@ -227,14 +230,14 @@ Les noms de mois romains sont en anglais, selon le standard du langage PHP.</p>
 	<td><input class="dateconvert" type="text" size="10" disabled name="jmname" value="<?php if (isset($juliandate["monthname"])) echo($juliandate["monthname"]);?>" /></td>
 	<td><input class="dateconvert" type="int" size="7" maxlength="7"  name="jyear" value="<?php echo htmlEntities($juliandate["relativeyear"]);?>" /> </td>
 	<td><button class="dateconvert" type="submit" name="Compute" value="Julian">Calculer sur cette date</button> </td>
-<tr><td>Date hébraïque: </td>
+<tr><td>Date hÃ©braÃ¯que: </td>
 	<td><input class="dateconvert" type="int" size="2" maxlength="2" name="hquant" value="<?php if (($jewdate["day"]>0)) echo ($jewdate["day"]);?>" /> </td>
 	<td><input class="dateconvert" type="int" size="2" maxlength="2"  name="hmonth" value="<?php if (($jewdate["month"]>0)) echo ($jewdate["month"]);?>" /> </td>
 	<td><input class="dateconvert" type="text" size="10" disabled name="hmname" value="<?php if (isset($jewdate["monthname"])) echo($jewdate["monthname"]);?>" /></td>
 	<td><input class="dateconvert" type="int" size="7" maxlength="7"  name="hyear" value="<?php if (($jewdate["year"]>0)) echo ($jewdate["year"]);?>" /> </td>
 	<td><button class="dateconvert" type="submit" name="Compute" value="Hebraic">Calculer sur cette date</button></td>
 </table>
-<Table class="dateconvert" align="center" > 
+<table class="dateconvert" align="center" > 
 <tr>
 	<td>Jour de semaine:</td><td> <input class="dateconvert" type="text" size="8" disabled name="wday" value="<?php if (isset($wd)) echo($wd);?>" /></td>
 	<td>Jour julien:</td> 
@@ -242,6 +245,6 @@ Les noms de mois romains sont en anglais, selon le standard du langage PHP.</p>
 	<td><button class="dateconvert" type="submit" name="Compute" value="JulianDay">Calculer sur ce jour julien</button> </td>
 </table><br/>
 </form>	
-<p class="dateconvert">Référence : <a href="http://www.calendriermilesien.org">www.calendriermilesien.org</a></p>
+<p class="dateconvert">RÃ©fÃ©rence : <a href="http://www.calendriermilesien.org">www.calendriermilesien.org</a></p>
 </body>
 </html>
